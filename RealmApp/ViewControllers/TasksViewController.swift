@@ -116,17 +116,20 @@ extension TasksViewController {
         let doneTitle = indexPath.section == 0 ? "Done" : "Undone"
         let doneAction = UIContextualAction(style: .normal, title: doneTitle) { [unowned self] _, _, isDone in
             tableView.beginUpdates()
-            if doneTitle == "Done" {
+            
+            switch doneTitle {
+            case "Done":
                 storageManager.updateTaskCompletion(task, bool: true)
                 let currentIndexPath = IndexPath(row: indexPath.row, section: 0)
                 let newIndexPath = IndexPath(row: completedTasks.count - 1, section: 1)
                 tableView.moveRow(at: currentIndexPath, to: newIndexPath)
-            } else {
+            default:
                 storageManager.updateTaskCompletion(task, bool: false)
                 let currentIndexPath = IndexPath(row: indexPath.row, section: 1)
                 let newIndexPath = IndexPath(row: currentTasks.count - 1, section: 0)
                 tableView.moveRow(at: currentIndexPath, to: newIndexPath)
             }
+            
             isDone(true)
             tableView.endUpdates()
         }

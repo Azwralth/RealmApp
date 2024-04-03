@@ -98,10 +98,8 @@ final class TaskListViewController: UITableViewController {
         switch sender.selectedSegmentIndex {
         case 0:
             taskLists = storageManager.fetchData(TaskList.self).sorted(byKeyPath: "date")
-        case 1:
-            taskLists = storageManager.fetchData(TaskList.self).sorted(byKeyPath: "title")
         default:
-            break
+            taskLists = storageManager.fetchData(TaskList.self).sorted(byKeyPath: "title")
         }
         
         tableView.reloadData()
