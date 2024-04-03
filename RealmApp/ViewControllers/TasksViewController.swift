@@ -115,6 +115,7 @@ extension TasksViewController {
         
         let doneTitle = indexPath.section == 0 ? "Done" : "Undone"
         let doneAction = UIContextualAction(style: .normal, title: doneTitle) { [unowned self] _, _, isDone in
+            
             tableView.beginUpdates()
             
             switch doneTitle {
