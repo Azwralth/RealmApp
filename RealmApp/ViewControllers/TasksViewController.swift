@@ -62,25 +62,47 @@ final class TasksViewController: UITableViewController {
 }
 
 extension TasksViewController {
+//    private func showAlert(with task: Task? = nil, completion: (() -> Void)? = nil) {
+//        let alertBuilder = AlertControllerBuilder(
+//            title: task != nil ? "Edit Task" : "New Task",
+//            message: "What do you want to do?"
+//        )
+//        
+//        alertBuilder
+//            .setTextField(withPlaceholder: "Task Title", andText: task?.title)
+//            .setTextField(withPlaceholder: "Note Title", andText: task?.note)
+//            .addAction(
+//                title: task != nil ? "Update Task" : "Save Task",
+//                style: .default
+//            ) { [unowned self] taskTitle, taskNote in
+//                if let task, let completion {
+//                    storageManager.edit(task, newTitle: taskTitle, and: taskNote)
+//                    completion()
+//                    return
+//                }
+//                createTask(withTitle: taskTitle, andNote: taskNote)
+//            }
+//            .addAction(title: "Cancel", style: .destructive)
+//        
+//        let alertController = alertBuilder.build()
+//        present(alertController, animated: true)
+//    }
+    
     private func showAlert(with task: Task? = nil, completion: (() -> Void)? = nil) {
         let alertBuilder = AlertControllerBuilder(
-            title: task != nil ? "Edit Task" : "New Task",
+            title: task?.title != nil ? "Edit task" : "New task",
             message: "What do you want to do?"
         )
         
         alertBuilder
             .setTextField(withPlaceholder: "Task Title", andText: task?.title)
-            .setTextField(withPlaceholder: "Note Title", andText: task?.note)
-            .addAction(
-                title: task != nil ? "Update Task" : "Save Task",
-                style: .default
-            ) { [unowned self] taskTitle, taskNote in
+            .setTextField(withPlaceholder: "Task Note", andText: task?.note)
+            .addAction(title: task?.title != nil ? "Update Task" : "Save Task", style: .default) { [unowned self] taskTitle, taskNote in
                 if let task, let completion {
                     storageManager.edit(task, newTitle: taskTitle, and: taskNote)
                     completion()
                     return
                 }
-                createTask(withTitle: taskTitle, andNote: taskNote)
             }
             .addAction(title: "Cancel", style: .destructive)
         
@@ -113,30 +135,36 @@ extension TasksViewController {
             isDone(true)
         }
         
-        let doneTitle = indexPath.section == 0 ? "Done" : "Undone"
-        let doneAction = UIContextualAction(style: .normal, title: doneTitle) { [unowned self] _, _, isDone in
+        let doneTitle = task.isComplete ? "Undone" : "Done"
+        let doneAction = UIContextualAction(style: .normal, title: doneTitle) {
+            [unowned self] _,
+            _,
+            isDone in
             
-            tableView.beginUpdates()
+            storageManager.done(task)
             
-            switch doneTitle {
-            case "Done":
-                storageManager.updateTaskCompletion(task, bool: true)
-                let currentIndexPath = IndexPath(row: indexPath.row, section: 0)
-                let newIndexPath = IndexPath(row: completedTasks.count - 1, section: 1)
-                tableView.moveRow(at: currentIndexPath, to: newIndexPath)
-            default:
-                storageManager.updateTaskCompletion(task, bool: false)
-                let currentIndexPath = IndexPath(row: indexPath.row, section: 1)
-                let newIndexPath = IndexPath(row: currentTasks.count - 1, section: 0)
-                tableView.moveRow(at: currentIndexPath, to: newIndexPath)
-            }
+            let currentIndex = IndexPath(
+                row: currentTasks.index(of: task) ?? 0,
+                section: 0
+            )
+            
+            let completeIndex = IndexPath(
+                row: completedTasks.index(of: task) ?? 0,
+                section: 1
+            )
+            
+            let destinationIndex = indexPath.section == 0 ? completeIndex : currentIndex
+            
+            tableView.moveRow(at: indexPath, to: destinationIndex)
+            
             
             isDone(true)
-            tableView.endUpdates()
         }
         
         doneAction.backgroundColor = #colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1)
         editAction.backgroundColor = .orange
+        
+        tableView.reloadData()
         
         return UISwipeActionsConfiguration(actions: [doneAction, editAction, deleteAction])
     }

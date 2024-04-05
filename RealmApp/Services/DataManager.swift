@@ -16,32 +16,20 @@ final class DataManager {
     private init() {}
     
     func createTempData(completion: @escaping () -> Void) {
-        let shoppingList = TaskList()
-        shoppingList.title = "Shopping List"
+        let shopingList = TaskList()
         
-        let moviesList = TaskList(
-            value: [
-                "Movies List",
-                Date(),
-                [
-                    ["Best film ever"],
-                    ["The best of the best", "Must have", Date(), true]
-                ]
-            ]
-        )
+        shopingList.title = "Shoping list"
         
-        let milk = Task()
-        milk.title = "Milk"
-        milk.note = "2L"
+        let bread = Task()
+        bread.title = "Хлеб"
+        bread.note = "2 батона"
         
-        let apples = Task(value: ["Apples", "2Kg"])
-        let bread = Task(value: ["title": "Bread", "isComplete": true])
+        let apples = Task(value: ["Apples", "2кг"])
         
-        shoppingList.tasks.append(milk)
-        shoppingList.tasks.insert(contentsOf: [apples, bread], at: 1)
+        shopingList.tasks.insert(contentsOf: [bread, apples], at: 0)
         
         DispatchQueue.main.async { [unowned self] in
-            storageManager.save([shoppingList, moviesList])
+            storageManager.save([shopingList])
             completion()
         }
     }

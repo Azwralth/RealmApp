@@ -82,9 +82,9 @@ final class StorageManager {
         }
     }
     
-    func updateTaskCompletion(_ task: Task, bool: Bool) {
+    func done(_ task: Task) {
         write {
-            task.setValue(bool, forKey: "isComplete")
+            task.isComplete.toggle()
         }
     }
     
